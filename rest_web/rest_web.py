@@ -2,23 +2,26 @@
 # CNA 335
 # Ian Hardgrave, ijhardgrave@student.rtc.edu
 
-from mysql import connector
-from flask import Flask, redirect, url_for, request, render_template
-import mysql.connector
-app = Flask(__name__, static_url_path='')
-
-conn = mysql.connector.connect(user='root', password='',
-                                  host='127.0.0.1',
-                                  database='zipcodes',
-                               buffered = True)
-cursor = conn.cursor()
-
 #https://stackoverflow.com/questions/8211128/multiple-distinct-pages-in-one-html-file
 #https://stackoverflow.com/questions/902408/how-to-use-variables-in-sql-statement-in-python
 #https://stackoverflow.com/questions/1081750/python-update-multiple-columns-with-python-variables
 #https://stackoverflow.com/questions/7478366/create-dynamic-urls-in-flask-with-url-for
 #https://github.com/vimalloc/flask-jwt-extended/issues/175
 
+
+from mysql import connector
+from flask import Flask, redirect, url_for, request, render_template
+import mysql.connector
+app = Flask(__name__, static_url_path='')
+
+#connect to database
+conn = mysql.connector.connect(user='root', password='',
+                                  host='127.0.0.1',
+                                  database='zipcodes',
+                               buffered = True)
+cursor = conn.cursor()
+
+#Search zipcode database
 @app.route('/searchzipcode/<searchZIP>')
 def searchzipcode(searchZIP):
     # Get data from database
@@ -30,6 +33,7 @@ def searchzipcode(searchZIP):
         searched = cursor.fetchall()
         return 'Success! Here you go: %s' % searched
 
+#update zipcode database population for a specified zip code
 @app.route('/updatezippop/<updateZIP> <updatePOP>')
 def updatezippop(updateZIP, updatePOP):
     cursor.execute("SELECT * FROM `table 1` WHERE Zipcode=%s", [updateZIP])
@@ -45,33 +49,25 @@ def updatezippop(updateZIP, updatePOP):
         else:
             return 'Population has been updated successfully for zip code: %s' % updateZIP
 
-
+#update webpage
 @app.route('/update',methods = ['POST'])
 def update():
        user = request.form['uzip']
        user2 = request.form['upop']
        return redirect(url_for('updatezippop', updateZIP=user, updatePOP=user2))
 
-
+#search page
 @app.route('/search', methods=['GET'])
 def search():
        user = request.args.get('szip')
        return redirect(url_for('searchzipcode', searchZIP=user))
 
 
-#@app.route('/update',methods = ['POST', 'GET'])
-#def update():
-#   if request.method == 'POST':
-#     user = request.form['updatezip']
-#      return redirect(url_for('updatezipcode',updatezip = user))
-#   else:
-#       pass
-
-
-
+#root of web server and gots to template (login.html)
 @app.route('/')
 def root():
    return render_template('login.html')
 
+#main
 if __name__ == '__main__':
    app.run(debug = True)
