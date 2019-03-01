@@ -3,38 +3,48 @@ from flask import Flask, redirect, url_for, request, render_template
 import mysql.connector
 app = Flask(__name__, static_url_path='')
 
-#conn = mysql.connector.connect(user='root', password='1234',
-#                                  host='10.22.1.240:8080',
-#                                  database='zipcodes',
-#                               buffered = True)
+conn = mysql.connector.connect(user='root', password='',
+                                  host='127.0.0.1',
+                                  database='zipcodes',
+                               buffered = True)
+cursor = conn.cursor()
 
 
 
-@app.route('/searchzipcode/<szip>')
-def searchZIP(searchzip):
+@app.route('/searchzipcode/<searchZIP>')
+def searchzipcode(searchZIP):
     # Get data from database
-    return 'Fetching data\n Population for %s is 1000' % searchzip
+    cursor.execute("SELECT * FROM `table 1` WHERE Zipcode=%s", [searchZIP])
+    test = cursor.rowcount
+    if test != 1:
+        return searchZIP + " was not found"
+    else:
+        searched = cursor.fetchall()
+        return 'Success, here you go: %s' % searched
 
-@app.route('/updatezipcode/<uzip>')
-def updateZIP(updatezip):
-    # Get data from database
-    return 'Fetching data\n Population for %s is 2000' % updatezip
+@app.route('/updatezipcode/<updateZIP> <updatePOP>')
+def updatezipcode(updateZIP, updatePOP):
+    cursor.execute("SELECT * FROM `table 1` WHERE Zipcode=%s", [updateZIP])
+    test = cursor.rowcount
+    if test != 1:
+        return updateZIP + " was not found"
+    else:
+        searched = cursor.fetchall()
+        return 'Success, here you go: %s' % searched
 
 
-@app.route('/update',methods = ['POST', 'GET'])
-def up():
-   if request.method == 'POST':
-       user = request.form('uzip')
-       return redirect(url_for('updatezipcode', updatezip=user))
-   else:
-       user = request.args.get('uzip')
-       return redirect(url_for('success', name=user))
+@app.route('/update',methods = ['POST'])
+def update():
+       user = request.form['uzip']
+       user2 = request.form['upop']
+       return redirect(url_for('updatezipcode', updateZIP=user, updatePOP=user2))
 
-@app.route('/search', methods=['POST', 'GET'])
-def sea():
-   if request.method == 'POST':
-       user = request.args.get['szip']
-       return redirect(url_for('searchzipcode', searchzip=user))
+
+@app.route('/search', methods=['GET'])
+def search():
+       user = request.args.get('szip')
+       return redirect(url_for('searchzipcode', searchZIP=user))
+
 
 #@app.route('/update',methods = ['POST', 'GET'])
 #def update():
