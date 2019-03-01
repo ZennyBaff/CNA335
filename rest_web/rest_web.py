@@ -20,24 +20,29 @@ def searchzipcode(searchZIP):
         return searchZIP + " was not found"
     else:
         searched = cursor.fetchall()
-        return 'Success, here you go: %s' % searched
+        return 'Success! Here you go: %s' % searched
 
-@app.route('/updatezipcode/<updateZIP> <updatePOP>')
-def updatezipcode(updateZIP, updatePOP):
+@app.route('/updatezippop/<updateZIP> <updatePOP>')
+def updatezippop(updateZIP, updatePOP):
     cursor.execute("SELECT * FROM `table 1` WHERE Zipcode=%s", [updateZIP])
     test = cursor.rowcount
     if test != 1:
         return updateZIP + " was not found"
     else:
-        searched = cursor.fetchall()
-        return 'Success, here you go: %s' % searched
+        cursor.execute("UPDATE `table 1` SET EstimatedPopulation = %s WHERE Zipcode= %s;", [updatePOP,updateZIP])
+        cursor.execute("SELECT * FROM `table 1` WHERE Zipcode=%s and EstimatedPopulation=%s", [updateZIP,updatePOP])
+        test1 = cursor.rowcount
+        if test1 != 1:
+            return updateZIP + "  failed to update"
+        else:
+            return 'Population has been updated successfully for zip code: %s' % updateZIP
 
 
 @app.route('/update',methods = ['POST'])
 def update():
        user = request.form['uzip']
        user2 = request.form['upop']
-       return redirect(url_for('updatezipcode', updateZIP=user, updatePOP=user2))
+       return redirect(url_for('updatezippop', updateZIP=user, updatePOP=user2))
 
 
 @app.route('/search', methods=['GET'])
