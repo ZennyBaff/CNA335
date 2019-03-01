@@ -1,3 +1,7 @@
+#Restful interface that has search and update options for navigating a Zip code database on Phpmyadmin.
+# CNA 335
+# Ian Hardgrave, ijhardgrave@student.rtc.edu
+
 from mysql import connector
 from flask import Flask, redirect, url_for, request, render_template
 import mysql.connector
@@ -9,7 +13,11 @@ conn = mysql.connector.connect(user='root', password='',
                                buffered = True)
 cursor = conn.cursor()
 
-
+#https://stackoverflow.com/questions/8211128/multiple-distinct-pages-in-one-html-file
+#https://stackoverflow.com/questions/902408/how-to-use-variables-in-sql-statement-in-python
+#https://stackoverflow.com/questions/1081750/python-update-multiple-columns-with-python-variables
+#https://stackoverflow.com/questions/7478366/create-dynamic-urls-in-flask-with-url-for
+#https://github.com/vimalloc/flask-jwt-extended/issues/175
 
 @app.route('/searchzipcode/<searchZIP>')
 def searchzipcode(searchZIP):
